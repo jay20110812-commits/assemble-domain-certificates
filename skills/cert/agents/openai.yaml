@@ -1,0 +1,3 @@
+interface:
+  display_name: "cert"
+  short_description: "合成附加證書並按域名輸出"
