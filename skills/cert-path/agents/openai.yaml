@@ -1,0 +1,3 @@
+interface:
+  display_name: "cert_path"
+  short_description: "指定證書的預設輸出資料夾"
