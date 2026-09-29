@@ -1,0 +1,3 @@
+interface:
+  display_name: "依域名合成證書"
+  short_description: "分析憑證並依 SAN 域名整理金鑰與完整鏈"
