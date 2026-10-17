@@ -1,5 +1,5 @@
 ---
-description: 合成附加或指定的證書檔，依 SAN 域名輸出
+description: 合成附加或指定的證書檔，只輸出 SAN 中的主域名
 argument-hint: [證書檔案路徑]
 ---
 
