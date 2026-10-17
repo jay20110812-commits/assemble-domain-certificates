@@ -1,6 +1,6 @@
 # 依域名合成 TLS 證書
 
-這個 Codex skill 讀取 PEM、CRT、CER、KEY、PFX、P12 或 ZIP 檔，依憑證的 DNS SAN 名稱建立各自的資料夾。每個資料夾輸出 `<域名>.key` 與 `fullchain.crt`；主域名與 `www` 名稱分開處理。處理前會核對憑證與私鑰是否匹配，遇到不同的既有輸出時預設停止。
+這個 Codex skill 讀取 PEM、CRT、CER、KEY、PFX、P12 或 ZIP 檔，依憑證的 DNS SAN 名稱建立各自的資料夾。每個資料夾輸出 `<域名>.key` 與 `fullchain.crt`；使用 `$cert` 或 `/cert` 時只輸出 SAN 中的主域名，不建立 `www` 資料夾。處理前會核對憑證與私鑰是否匹配，遇到不同的既有輸出時預設停止。
 
 ## 安裝
 
@@ -19,7 +19,7 @@
 
 ```bash
 python3 skills/assemble-domain-certificates/scripts/assemble.py --set-output /absolute/path/to/cert_store
-python3 skills/assemble-domain-certificates/scripts/assemble.py /absolute/path/to/certificate.zip
+python3 skills/assemble-domain-certificates/scripts/assemble.py --root-only /absolute/path/to/certificate.zip
 ```
 
 需要 OpenSSL。若輸入 PFX 或私鑰有密碼，使用 `--password-env` 指定裝有密碼的環境變數。腳本不會將私鑰內容輸出到終端。
