@@ -113,14 +113,17 @@ def chain_for(leaf, certs):
     return b"".join(c["pem"] for c in chain)
 
 
-def plan_output(certs, keys):
+def plan_output(certs, keys, root_only=False):
     plan = {}
     for leaf in (c for c in certs if c["names"]):
         key = keys.get(leaf["public"])
         if key is None:
             raise ValueError(f"No matching private key for certificate {leaf['source']}")
         chain = chain_for(leaf, certs)
-        for name in leaf["names"]:
+        names = leaf["names"]
+        if root_only:
+            names = tuple(name for name in names if not name.startswith("www.") and not name.startswith("*.") and not any(name.endswith("." + parent) for parent in leaf["names"] if parent != name and not parent.startswith("*.")))
+        for name in names:
             if not DNS.fullmatch(name) or ".." in name or "/" in name or "\\" in name:
                 raise ValueError(f"Unsafe DNS SAN name: {name!r}")
             files = {"fullchain.crt": chain, f"{name}.key": key}
@@ -172,6 +175,7 @@ def main():
     parser.add_argument("--show-output", action="store_true", help="Show the saved output path")
     parser.add_argument("--password-env", help="Environment variable containing a PFX or private-key password")
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument("--root-only", action="store_true", help="Output only base SAN names; omit www and names nested under another SAN")
     args = parser.parse_args()
     if args.set_output is not None:
         if args.inputs or args.output or args.show_output:
@@ -206,7 +210,7 @@ def main():
     password = os.environ.get(args.password_env, "") if args.password_env else ""
     try:
         certs, keys, ignored = materials(args.inputs, password)
-        plan = plan_output(certs, keys)
+        plan = plan_output(certs, keys, args.root_only)
         write_output(plan, args.output, args.overwrite)
     except (OSError, ValueError, zipfile.BadZipFile) as exc:
         parser.exit(1, f"Error: {exc}\n")
